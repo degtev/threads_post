@@ -1,3 +1,32 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": "b1560403-bac2-4340-82ff-802d5402c04f",
+      "redditId": "t3_1v764nm",
+      "subreddit": "technology",
+      "originalTitle": "Neighbors say noise from Michigan data center is 24/7 and upending their lives",
+      "originalText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/technology/comments/1v764nm/neighbors_say_noise_from_michigan_data_center_is/\"> <img src=\"https://external-preview.redd.it/88bRNIGq24J2MX5MJDuI2o8-Fdnc-wit7J1gu54-cXc.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=1a97e709ef82479da3fb0228def08aaa8f870732\" alt=\"Neighbors say noise from Michigan data center is 24/7 and upending their lives\" title=\"Neighbors say noise from Michigan data center is 24/7 and upending their lives\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Brendawg324\"> /u/Brendawg324 </a> <br/> <span><a href=\"https://www.wxyz.com/news/voices/neighbors-say-noise-from-michigan-data-center-is-24-7-and-upending-their-lives\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/technology/comments/1v764nm/neighbors_say_noise_from_michigan_data_center_is/\">[comments]</a></span> </td></tr></table>",
+      "originalUrl": "https://www.reddit.com/r/technology/comments/1v764nm/neighbors_say_noise_from_michigan_data_center_is/",
+      "rewrittenText": "Живёте рядом с дата-центром? Мечтаете о тишине? Жители Мичигана говорят, что гул от нового объекта не смолкает ни днём ни ночью 😤\n\nПо их словам, это похоже на работу гигантского кондиционера прямо за окном — 24/7, без выходных. Люди не могут спать, работать из дома и даже просто дышать свежим воздухом без этого фонового шума.\n\nОни обратились к властям, но проблема пока не решена. А ведь технологии должны делать жизнь удобнее, а не превращать её в ад. Как думаете, кто должен отвечать за такие побочные эффекты прогресса?",
+      "score": 0,
+      "status": "rejected",
+      "threadsPostId": null,
+      "createdAt": "2026-07-26T20:12:56.467Z",
+      "publishedAt": null
+    },
+    {
+      "id": "3b5eb178-b62a-47a8-bb3d-1eeda86045fe",
+      "redditId": "t3_1v6zsx7",
+      "subreddit": "technology",
+      "originalTitle": "Inside the growing vigilante movement to knock out Flock surveillance cameras /// An underground network of privacy activists is disabling or destroying the ubiquitous surveillance devices sprouting up across the US",
+      "originalText": "<table> <tr><td> <a href=\"https://www.reddit.com/r/technology/comments/1v6zsx7/inside_the_growing_vigilante_movement_to_knock/\"> <img src=\"https://external-preview.redd.it/OCeDlq4SRpyN1WtA9m35MSYiWO2y2wSiNpaisK1nXSU.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=6703d270503af3dbf66189fae69f25ee9d81d013\" alt=\"Inside the growing vigilante movement to knock out Flock surveillance cameras /// An underground network of privacy activists is disabling or destroying the ubiquitous surveillance devices sprouting up across the US\" title=\"Inside the growing vigilante movement to knock out Flock surveillance cameras /// An underground network of privacy activists is disabling or destroying the ubiquitous surveillance devices sprouting up across the US\" /> </a> </td><td> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/HumbleRestaurant790\"> /u/HumbleRestaurant790 </a> <br/> <span><a href=\"https://www.theguardian.com/us-news/ng-interactive/2026/jul/25/flock-surveillance-cameras\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/technology/comments/1v6zsx7/inside_the_growing_vigilante_movement_to_knock/\">[comments]</a></span> </td></tr></table>",
+      "originalUrl": "https://www.reddit.com/r/technology/comments/1v6zsx7/inside_the_growing_vigilante_movement_to_knock/",
+      "rewrittenText": "В Штатах набирает обороты подпольное движение против тотальной слежки. Активисты, выступающие за приватность, начали физически уничтожать камеры Flock, которые заполонили улицы. Они вырезают провода, заливают клеем линзы, а иногда и просто сбивают устройства. Считают это не вандализмом, а самообороной от цифрового концлагеря. Интересно, докатится ли это до нас? 🤔",
+      "score": 0,
+      "status": "rewritten",
+      "threadsPostId": null,
+      "createdAt": "2026-07-26T20:13:24.138Z",
+      "publishedAt": null
+    }
+  ]
 }
