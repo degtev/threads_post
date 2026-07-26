@@ -3,35 +3,54 @@ import logger from '../utils/logger.js';
 import { findByRedditId } from '../db/store.js';
 
 /**
- * Парсинг RSS (Atom) фида Reddit.
- * Reddit отдаёт RSS без авторизации.
- * @param {string} subreddit
+ * Парсинг RSS (Atom) фида Reddit для одного или нескольких сабреддитов (multireddit).
+ * Пример multireddit: r/technology+programming+ChatGPT/hot.rss
+ * @param {string} subPath — 'sub1+sub2' или 'sub1'
+ * @param {number} retries
  * @returns {Promise<Array>}
  */
-async function fetchSubredditRSS(subreddit) {
-  const url = `https://www.reddit.com/r/${subreddit}/hot.rss?limit=25`;
+async function fetchMultiredditRSS(subPath, retries = 2) {
+  const url = `https://www.reddit.com/r/${subPath}/hot.rss?limit=50`;
 
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-      'Accept': 'application/rss+xml, application/xml, text/xml',
-    },
-  });
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+          'Accept': 'application/rss+xml, application/xml, text/xml',
+        },
+      });
 
-  if (!response.ok) {
-    logger.error(`Reddit RSS ошибка для r/${subreddit}: ${response.status}`);
-    return [];
+      if (response.status === 429 && attempt < retries) {
+        const waitMs = (attempt + 1) * (config.reddit.delayMs || 4000);
+        logger.warn(`Reddit RSS 429 (Rate limit). Повтор через ${waitMs / 1000}сек...`);
+        await new Promise((r) => setTimeout(r, waitMs));
+        continue;
+      }
+
+      if (!response.ok) {
+        logger.error(`Reddit RSS ошибка HTTP ${response.status} для ${subPath}`);
+        return [];
+      }
+
+      const xml = await response.text();
+      return parseAtomFeed(xml);
+    } catch (err) {
+      logger.error(`Ошибка сетевого запроса к Reddit RSS: ${err.message}`);
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
   }
 
-  const xml = await response.text();
-  return parseAtomFeed(xml, subreddit);
+  return [];
 }
 
 /**
  * Простой парсинг Atom XML без внешних зависимостей.
- * Извлекает title, link, content из <entry>.
+ * Извлекает title, link, content, subreddit из <entry>.
  */
-function parseAtomFeed(xml, subreddit) {
+function parseAtomFeed(xml) {
   const entries = [];
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
   let match;
@@ -43,6 +62,10 @@ function parseAtomFeed(xml, subreddit) {
     const link = extractAttr(entry, 'link', 'href') || '';
     const content = extractTag(entry, 'content') || '';
     const id = extractTag(entry, 'id') || '';
+
+    // Определяем сабреддит из ссылки: /r/subreddit_name/comments/...
+    const subMatch = link.match(/\/r\/([a-zA-Z0-9_]+)\/comments\//i);
+    const subreddit = subMatch ? subMatch[1] : 'unknown';
 
     // Извлекаем Reddit post ID из ссылки (t3_xxxxx)
     const idMatch = link.match(/comments\/([a-z0-9]+)\//i);
@@ -105,58 +128,57 @@ function extractAttr(xml, tag, attr) {
 
 /**
  * Найти один трендовый пост, которого ещё нет в базе.
+ * Объединяет все сабреддиты в один запрос r/sub1+sub2+sub3/hot.rss
  * @returns {Promise<object|null>}
  */
 export async function findTrendingPost() {
-  const allCandidates = [];
-
+  const subConfigMap = new Map();
   for (const sub of config.subreddits) {
-    try {
-      const posts = await fetchSubredditRSS(sub.name);
-
-      const filtered = posts.filter((post) => {
-        // Проверяем минимальный score (если удалось извлечь)
-        // RSS не всегда содержит score, поэтому пропускаем посты с score=0
-        // только для крупных сабов
-        if (post.score > 0 && post.score < sub.minScore) return false;
-
-        // Нужен хотя бы заголовок
-        if (post.title.length < 20) return false;
-
-        // Не дубли
-        if (findByRedditId(post.redditId)) return false;
-
-        return true;
-      });
-
-      for (const post of filtered) {
-        allCandidates.push({
-          redditId: post.redditId,
-          subreddit: post.subreddit,
-          originalTitle: post.title,
-          originalText: post.text,
-          originalUrl: post.url,
-          score: post.score,
-        });
-      }
-
-      logger.info(`r/${sub.name}: ${posts.length} постов, ${filtered.length} прошли фильтр`);
-
-      // Пауза между запросами (Reddit rate limiting)
-      await new Promise((r) => setTimeout(r, 1000));
-    } catch (err) {
-      logger.error(`Ошибка при парсинге r/${sub.name}: ${err.message}`);
-    }
+    subConfigMap.set(sub.name.toLowerCase(), sub.minScore);
   }
 
-  if (allCandidates.length === 0) {
-    logger.warn('Не найдено подходящих постов ни в одном сабреддите');
+  const subNamesJoined = config.subreddits.map((s) => s.name).join('+');
+  logger.info(`Запрашиваю посты из сабреддитов [${subNamesJoined}] в 1 запрос...`);
+
+  const posts = await fetchMultiredditRSS(subNamesJoined);
+
+  if (posts.length === 0) {
+    logger.warn('Не получено постов от Reddit RSS');
     return null;
   }
 
-  // Сортируем по score (убывание), посты без score — в конец
+  const allCandidates = [];
+
+  for (const post of posts) {
+    const minScore = subConfigMap.get(post.subreddit.toLowerCase()) ?? 500;
+
+    // Проверяем минимальный score (если удалось извлечь)
+    if (post.score > 0 && post.score < minScore) continue;
+
+    // Нужен хотя бы заголовок от 20 символов
+    if (post.title.length < 20) continue;
+
+    // Не дубли
+    if (findByRedditId(post.redditId)) continue;
+
+    allCandidates.push({
+      redditId: post.redditId,
+      subreddit: post.subreddit,
+      originalTitle: post.title,
+      originalText: post.text,
+      originalUrl: post.url,
+      score: post.score,
+    });
+  }
+
+  if (allCandidates.length === 0) {
+    logger.warn('Все полученные посты являются дублями или не прошли по порогу upvotes');
+    return null;
+  }
+
+  // Сортируем по score (убывание)
   allCandidates.sort((a, b) => b.score - a.score);
 
-  logger.info(`Найдено ${allCandidates.length} кандидатов`);
+  logger.info(`Найдено ${allCandidates.length} кандидатов, лучший из r/${allCandidates[0].subreddit}`);
   return allCandidates[0];
 }

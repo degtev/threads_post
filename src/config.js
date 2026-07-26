@@ -1,21 +1,23 @@
 import 'dotenv/config';
 
 const config = {
-  // Сабреддиты с индивидуальными порогами upvotes
-  subreddits: [
-    { name: 'technology', minScore: 1000 },
-    { name: 'programming', minScore: 1000 },
-    { name: 'ChatGPT', minScore: 1000 },
-    { name: 'MachineLearning', minScore: 500 },
-    { name: 'artificial', minScore: 500 },
-    { name: 'LocalLLaMA', minScore: 500 },
-  ],
+  // Сабреддиты (из .env или по умолчанию)
+  subreddits: (process.env.SUBREDDITS || 'technology:1000,programming:1000,ChatGPT:1000,MachineLearning:500,artificial:500,LocalLLaMA:500')
+    .split(',')
+    .map((item) => {
+      const [name, scoreStr] = item.trim().split(':');
+      return {
+        name,
+        minScore: scoreStr ? parseInt(scoreStr, 10) : 500,
+      };
+    }),
 
   // Reddit
   reddit: {
     sort: 'hot',           // hot | top | rising
     limit: 25,             // постов за запрос
     userAgent: 'ThreadsAutoPoster/1.0.0',
+    delayMs: parseInt(process.env.REDDIT_DELAY_MS || '4000', 10),
   },
 
   // AnyModel (OpenAI-compatible)

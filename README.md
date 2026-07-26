@@ -33,6 +33,8 @@ copy .env.example .env
 |:---|:---|:---|
 | `TELEGRAM_BOT_TOKEN` | Токен Telegram бота | [@BotFather](https://t.me/BotFather) → `/newbot` |
 | `TELEGRAM_ADMIN_CHAT_ID` | Ваш Chat ID в Telegram | [@userinfobot](https://t.me/userinfobot) |
+| `SUBREDDITS` | Список сабреддитов через запятую (`имя:порог`) | `technology:1000,programming:1000,ChatGPT:1000` |
+| `REDDIT_DELAY_MS` | Пауза между запросами к сабреддитам в мс | `4000` (по умолчанию 4 сек) |
 | `ANYMODEL_API_KEY` | API-ключ AnyModel | [anymodel.org](https://anymodel.org) → Личный кабинет |
 | `ANYMODEL_MODEL` | Модель ИИ | `deepseek-chat` (по умолчанию) |
 | `THREADS_ACCESS_TOKEN` | Threads access token | См. раздел ниже |
