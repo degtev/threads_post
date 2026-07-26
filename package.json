@@ -1,0 +1,22 @@
+{
+  "name": "threads-auto-poster",
+  "version": "1.0.0",
+  "description": "Auto-post trending Reddit content to Threads via Telegram moderation",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": ["threads", "reddit", "telegram", "bot", "ai"],
+  "license": "MIT",
+  "dependencies": {
+    "grammy": "^1.35.0",
+    "lowdb": "^7.0.1",
+    "openai": "^4.80.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.7",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0"
+  }
+}
